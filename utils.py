@@ -1,3 +1,7 @@
+# Function to pretty print the neighbours with colors.
+# Made by ChatGPT only for the better visualization of the neighbours
+
+
 def pretty_print_neighbours(currentSolution, neighbours, fitness, neighboursFitness):
     print("Initial solution:     ", currentSolution,
           f"Fitness: {fitness}")
@@ -21,8 +25,13 @@ def pretty_print_neighbours(currentSolution, neighbours, fitness, neighboursFitn
 
     for i, neighbour in enumerate(neighbours):
         # Identify which bit was flipped
-        flipped_bit = [j for j in range(
-            len(currentSolution)) if currentSolution[j] != neighbour[j]][0]
+        flipped_bits = [j for j in range(
+            len(currentSolution)) if currentSolution[j] != neighbour[j]]
+        if not flipped_bits:
+            # Skip printing if no bit was flipped (should not happen)
+            print(f"Neighbour {i:2d} (bit --): identical to current solution, skipping.")
+            continue
+        flipped_bit = flipped_bits[0]
 
         # Use color for the flipped bit
         color = colors[i % len(colors)]
@@ -33,12 +42,12 @@ def pretty_print_neighbours(currentSolution, neighbours, fitness, neighboursFitn
             else:
                 colored_neighbour.append(str(bit))
 
-        fitness = fitnesses[i]
+        fit = fitnesses[i]
         # Color the best fitness in green
-        if fitness == max_fitness:
-            fitness_str = f"{green_color}Fitness: {fitness}{reset_color}"
+        if fit == max_fitness:
+            fitness_str = f"{green_color}Fitness: {fit}{reset_color}"
         else:
-            fitness_str = f"Fitness: {fitness}"
+            fitness_str = f"Fitness: {fit}"
 
         print(
             f"Neighbour {i:2d} (bit {flipped_bit:2d}): [{', '.join(colored_neighbour)}] {fitness_str}")
