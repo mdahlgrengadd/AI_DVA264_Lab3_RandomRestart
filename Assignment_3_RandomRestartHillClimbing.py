@@ -4,9 +4,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import confusion_matrix
 import random
 
-from utils import pretty_print_neighbours
-
-
 # The dataset is uploaded
 f = open("Assignment 3 medical_dataset.DATA")
 dataset_X = []

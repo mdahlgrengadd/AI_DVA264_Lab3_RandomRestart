@@ -101,7 +101,7 @@ def GenerateKNeighbours(currentSolution, K):
     neighbours = []
     n = len(currentSolution)
 
-    # Generate all bitmasks with exactly K bits set to 1
+    # Generate all bitmasks with exactly K bits set to 1 and the rest set to 0.
     # Then create a new neighbor by flipping bits indicated by the mask
     for mask in bitmasks(n, K):
         neighbour = currentSolution.copy()
@@ -114,6 +114,8 @@ def GenerateKNeighbours(currentSolution, K):
 
 
 def bitmasks(n, m):
+    # Note my code, its from the internet
+    # It will create ALL bitmask of size n with m bits set to 1
     # https://dassencio.org/59
     # Generating bitmask permutations in Python
     if m < n:
