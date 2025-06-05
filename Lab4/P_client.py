@@ -12,76 +12,75 @@ from datetime import date
 
 
 def ACTIONS(board, playerTurn):
-    valid_actions = []
+    possible_moves = []
 
     if playerTurn == 1:
         for i in range(6):
             if board[i] > 0:
-                valid_actions.append(i + 1)  # Convert to move number (1-6)
+                possible_moves.append(i + 1)  # Convert to move number (1-6)
     else:
         for i in range(7, 13):
             if board[i] > 0:
-                valid_actions.append(i - 6)  # Convert to move number (1-6)
+                possible_moves.append(i - 6)  # Convert to move number (1-6)
 
-    return valid_actions
+    return possible_moves
 
 
 def TERMINAL_TEST(board):
-    player1_empty = all(board[i] == 0 for i in range(6))
-
-    player2_empty = all(board[i] == 0 for i in range(7, 13))
-
-    return player1_empty or player2_empty
+    empty1 = all(board[i] == 0 for i in range(6))
+    empty2 = all(board[i] == 0 for i in range(7, 13))
+    IS_GAME_OVER = empty1 or empty2
+    return IS_GAME_OVER
 
 
 def RESULT(board, action, playerTurn):
-    new_board = board.copy()
+    board_copy = board.copy()
 
-    result = play(playerTurn, action, new_board)
+    result = play(playerTurn, action, board_copy)
 
     if result is None:
-        return new_board, playerTurn
+        return board_copy, playerTurn
 
-    new_board, next_player = result
-    return new_board, next_player
+    board_copy, next_player = result
+    return board_copy, next_player
 
 
-def UTILITY(board, original_player):
-    final_board = board.copy()
+def UTILITY(board, actual_player):
+    board_copy = board.copy()
 
-    p1_remaining = sum(final_board[0:6])
-    final_board[6] += p1_remaining
+    add_to_p1 = sum(board_copy[0:6])
+    board_copy[6] += add_to_p1
 
-    p2_remaining = sum(final_board[7:13])
-    final_board[13] += p2_remaining
+    add_to_p2 = sum(board_copy[7:13])
+    board_copy[13] += add_to_p2
 
-    if original_player == 1:
-        return final_board[6] - final_board[13]  # P1 store - P2 store
+    if actual_player == 1:
+        return board_copy[6] - board_copy[13]  # P1 store - P2 store
     else:
-        return final_board[13] - final_board[6]  # P2 store - P1 store
+        return board_copy[13] - board_copy[6]  # P2 store - P1 store
 
 
-def EVALUATE(board, original_player, depth):
+def EVALUATE(board, actual_player, depth):
     if TERMINAL_TEST(board):
-        return UTILITY(board, original_player)
+        return UTILITY(board, actual_player)
 
-    if original_player == 1:
+    if actual_player == 1:
         score_diff = board[6] - board[13]
     else:
         score_diff = board[13] - board[6]
 
-    if original_player == 1:
-        our_stones = sum(board[0:6])
-        opp_stones = sum(board[7:13])
+    if actual_player == 1:
+        player_nr_stones = sum(board[0:6])
+        opponent_nr_stones = sum(board[7:13])
     else:
-        our_stones = sum(board[7:13])
-        opp_stones = sum(board[0:6])
+        player_nr_stones = sum(board[7:13])
+        opponent_nr_stones = sum(board[0:6])
 
-    stone_advantage = our_stones - opp_stones
+    stones_diff = player_nr_stones - opponent_nr_stones
 
     evaluation = (
         10 * score_diff +
-        1 * stone_advantage
+        1 * stones_diff
     )
 
     return evaluation
