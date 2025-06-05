@@ -27,8 +27,8 @@ def ACTIONS(board, playerTurn):
 
 
 def TERMINAL_TEST(board):
-    empty1 = all(board[i] == 0 for i in range(6))
-    empty2 = all(board[i] == 0 for i in range(7, 13))
+    empty1 = sum(board[0:6]) == 0
+    empty2 = sum(board[7:13]) == 0
     IS_GAME_OVER = empty1 or empty2
     return IS_GAME_OVER
 
