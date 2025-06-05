@@ -66,10 +66,6 @@ The computer looks at several things to decide if a position is good:
 - How many stones are on my side vs opponent's side?
 - More stones on my side = more chances to score
 
-#### 🎯 **Number of Moves Available**
-- Can I make lots of different moves?
-- Having options is good - being stuck is bad!
-
 The computer combines these like a recipe:
 - Treasure box difference × 10 (most important!)
 - Stone advantage × 2 (somewhat important)

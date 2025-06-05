@@ -60,7 +60,7 @@ def UTILITY(board, actual_player):
         return board_copy[13] - board_copy[6]  # P2 store - P1 store
 
 
-def EVALUATE(board, actual_player, depth):
+def UTIL_EVAL(board, actual_player, depth):
     if TERMINAL_TEST(board):
         return UTILITY(board, actual_player)
 
@@ -86,59 +86,81 @@ def EVALUATE(board, actual_player, depth):
     return evaluation
 
 
-def MAX_VALUE(board, original_player, current_player, depth, max_depth):
-    if TERMINAL_TEST(board) or depth >= max_depth:
-        return EVALUATE(board, original_player, depth)
+# ---------------------------------------------------------------------------
+# Minimax algorithm – core recursive routines
+# Adapted from Lecture 7 “Adversarial Search (Multi-agent Decision Making)”
+# slide set by Johan Hjorth in (Lecture_7.pptx)
+# ---------------------------------------------------------------------------
+
+# function MAX-VALUE(state)          # Returns a utility value
+#     if TERMINAL-TEST(state) then
+#         return UTILITY(state)
+#     v ← −∞
+#     for each a in ACTIONS(state) do
+#         v ← MAX(v, MIN-VALUE(RESULT(state, a)))
+#     return v
+
+# function MIN-VALUE(state)          # Returns a utility value
+#     if TERMINAL-TEST(state) then
+#         return UTILITY(state)
+#     v ← ∞
+#     for each a in ACTIONS(state) do
+#         v ← MIN(v, MAX-VALUE(RESULT(state, a)))
+#     return v
+
+def MAX_VALUE(state, original_player, current_player, depth, max_depth):
+    if TERMINAL_TEST(state) or depth >= max_depth:
+        return UTIL_EVAL(state, original_player, depth)
 
     v = float('-inf')
-    actions = ACTIONS(board, current_player)
+    actions = ACTIONS(state, current_player)
 
-    for action in actions:
-        new_board, next_player = RESULT(board, action, current_player)
-        v = max(v, MIN_VALUE(new_board, original_player,
+    for a in actions:
+        new_state, next_player = RESULT(state, a, current_player)
+        v = max(v, MIN_VALUE(new_state, original_player,
                 next_player, depth + 1, max_depth))
 
     return v
 
 
-def MIN_VALUE(board, original_player, current_player, depth, max_depth):
-    if TERMINAL_TEST(board) or depth >= max_depth:
-        return EVALUATE(board, original_player, depth)
+def MIN_VALUE(state, original_player, current_player, depth, max_depth):
+    if TERMINAL_TEST(state) or depth >= max_depth:
+        return UTIL_EVAL(state, original_player, depth)
 
     v = float('inf')
-    actions = ACTIONS(board, current_player)
+    actions = ACTIONS(state, current_player)
 
-    for action in actions:
-        new_board, next_player = RESULT(board, action, current_player)
-        v = min(v, MAX_VALUE(new_board, original_player,
+    for a in actions:
+        new_state, next_player = RESULT(state, a, current_player)
+        v = min(v, MAX_VALUE(new_state, original_player,
                 next_player, depth + 1, max_depth))
 
     return v
 
 
-def MINIMAX(board, playerTurn, max_depth=3):
+def MINIMAX(state, playerTurn, max_depth=3):
     best_action = None
     best_value = float('-inf')
 
-    actions = ACTIONS(board, playerTurn)
+    actions = ACTIONS(state, playerTurn)
 
     if not actions:
         return None
 
-    for action in actions:
-        new_board, next_player = RESULT(board, action, playerTurn)
+    for a in actions:
+        new_state, next_player = RESULT(state, a, playerTurn)
 
         if next_player == playerTurn:
             action_value = MAX_VALUE(
-                new_board, playerTurn, next_player, 1, max_depth)
+                new_state, playerTurn, next_player, 1, max_depth)
         else:
 
             action_value = MIN_VALUE(
-                new_board, playerTurn, next_player, 1, max_depth)
+                new_state, playerTurn, next_player, 1, max_depth)
 
         if action_value > best_value:
             best_value = action_value
-            best_action = action
+            best_action = a
 
     return best_action
 
@@ -148,6 +170,10 @@ def decide_move(boardIn, playerTurnIn):
     playerMove = str(best_move)
     return playerMove, "minimax"
 
+
+######################################
+# Rest is unchanged from original code
+######################################
 
 def play(playerTurn: int, playerMove: int, boardGame):
     # playerTurn ar 1 eller 2

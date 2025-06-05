@@ -73,16 +73,14 @@ For non-terminal states, the AI uses a weighted combination of factors:
 def EVALUATE(board, original_player, depth):
     evaluation = (
         10 * score_diff +      # Store difference (most important)
-        2 * stone_advantage +   # Stone count advantage  
-        1 * mobility           # Move flexibility
+        1 * stone_advantage    # Stone count advantage  
     )
     return evaluation
 ```
 
 **Factors considered:**
 1. **Score Difference** (Weight: 10) - Stones in stores
-2. **Stone Advantage** (Weight: 2) - Total stones on player's side vs opponent
-3. **Mobility** (Weight: 1) - Number of available moves
+2. **Stone Advantage** (Weight: 1) - Total stones on player's side vs opponent
 
 ### Game Simulation
 The `play()` function accurately simulates Mancala moves:
