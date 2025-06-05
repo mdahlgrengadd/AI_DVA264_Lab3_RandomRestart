@@ -55,9 +55,9 @@ def UTILITY(board, actual_player):
     board_copy[13] += add_to_p2
 
     if actual_player == 1:
-        return board_copy[6] - board_copy[13]  # P1 store - P2 store
+        return board_copy[6] - board_copy[13]
     else:
-        return board_copy[13] - board_copy[6]  # P2 store - P1 store
+        return board_copy[13] - board_copy[6]
 
 
 def UTIL_EVAL(board, actual_player, depth):
@@ -171,9 +171,9 @@ def decide_move(boardIn, playerTurnIn):
     return playerMove, "minimax"
 
 
-######################################
-# Rest is unchanged from original code
-######################################
+###################
+# Rest is unchanged
+###################
 
 def play(playerTurn: int, playerMove: int, boardGame):
     # playerTurn ar 1 eller 2
