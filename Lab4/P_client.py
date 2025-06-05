@@ -11,47 +11,14 @@ import os
 from datetime import date
 
 
-# def decide_move_rnd(boardIn, playerTurnIn):
-#     #CHANGE THIS FILE TO CODE INTELLIGENCE IN YOUR CLIENT.
-#     # PLAYERMOVE IS '1'..'6'
-#     # BOARDIN CONSISTS OF 14 INTS. BOARDIN[0-5] ARE P1 HOLES, BOARDIN[6] IS P1 STORE
-#     # BOARDIN[7-12] ARE P2 HOLES, BOARDIN[13] IS P2 STORE
-#     moves = [
-#         '1',
-#         '2',
-#         '3',
-#         '4',
-#         '5',
-#         '6']
-#     if playerTurnIn == 1:
-#         options = np.array(boardIn[0:6])
-#         options = np.where(options > 0)
-#         options = options[0]
-#         position = options[np.random.randint(len(options), size=1)]
-#         playerMove = moves[position[0]]
-#     elif playerTurnIn == 2:
-#         options = np.array(boardIn[7:13])
-#         options = np.where(options > 0)
-#         options = options[0]
-#         position = options[np.random.randint(len(options), size=1)]
-#         playerMove = moves[position[0]]
-#     return playerMove, "randommove"
-
-
 def ACTIONS(board, playerTurn):
-    """
-    Returns list of valid actions (moves 1-6) for the current player
-    An action is valid if the corresponding pit has stones > 0
-    """
     valid_actions = []
 
     if playerTurn == 1:
-        # Player 1: check pits 0-5 (indices 0-5)
         for i in range(6):
             if board[i] > 0:
                 valid_actions.append(i + 1)  # Convert to move number (1-6)
     else:
-        # Player 2: check pits 7-12 (indices 7-12)
         for i in range(7, 13):
             if board[i] > 0:
                 valid_actions.append(i - 6)  # Convert to move number (1-6)
@@ -60,32 +27,19 @@ def ACTIONS(board, playerTurn):
 
 
 def TERMINAL_TEST(board):
-    """
-    Check if the game state is terminal
-    Game ends when all pits on one side are empty
-    """
-    # Check if Player 1's side (indices 0-5) is empty
     player1_empty = all(board[i] == 0 for i in range(6))
 
-    # Check if Player 2's side (indices 7-12) is empty
     player2_empty = all(board[i] == 0 for i in range(7, 13))
 
     return player1_empty or player2_empty
 
 
 def RESULT(board, action, playerTurn):
-    """
-    Apply an action to the board and return the new board state and next player
-    Uses the existing play() function to simulate the move
-    """
-    # Create a copy of the board to avoid modifying the original
     new_board = board.copy()
 
-    # Apply the move using the existing play function
     result = play(playerTurn, action, new_board)
 
     if result is None:
-        # Invalid move, return original state
         return new_board, playerTurn
 
     new_board, next_player = result
@@ -93,22 +47,14 @@ def RESULT(board, action, playerTurn):
 
 
 def UTILITY(board, original_player):
-    """
-    Evaluate the utility of a terminal state from the perspective of original_player
-    Higher values are better for original_player
-    """
-    # In terminal state, add remaining stones to respective stores
     final_board = board.copy()
 
-    # Add remaining Player 1 stones to Player 1's store
     p1_remaining = sum(final_board[0:6])
     final_board[6] += p1_remaining
 
-    # Add remaining Player 2 stones to Player 2's store
     p2_remaining = sum(final_board[7:13])
     final_board[13] += p2_remaining
 
-    # Calculate score difference from original player's perspective
     if original_player == 1:
         return final_board[6] - final_board[13]  # P1 store - P2 store
     else:
@@ -116,20 +62,14 @@ def UTILITY(board, original_player):
 
 
 def EVALUATE(board, original_player, depth):
-    """
-    Heuristic evaluation function for non-terminal states
-    Combines multiple strategic factors
-    """
     if TERMINAL_TEST(board):
         return UTILITY(board, original_player)
 
-    # Basic score difference (stones in stores)
     if original_player == 1:
         score_diff = board[6] - board[13]
     else:
         score_diff = board[13] - board[6]
 
-    # Stone count advantage (total stones on our side vs opponent)
     if original_player == 1:
         our_stones = sum(board[0:6])
         opp_stones = sum(board[7:13])
@@ -139,20 +79,15 @@ def EVALUATE(board, original_player, depth):
 
     stone_advantage = our_stones - opp_stones
 
-    # Combine factors with weights
     evaluation = (
-        10 * score_diff +      # Store difference (most important)
-        1 * stone_advantage   # Stone count advantage
+        10 * score_diff +
+        1 * stone_advantage
     )
 
     return evaluation
 
 
 def MAX_VALUE(board, original_player, current_player, depth, max_depth):
-    """
-    MAX algorithm implementation
-    Returns the utility value for maximizing player
-    """
     if TERMINAL_TEST(board) or depth >= max_depth:
         return EVALUATE(board, original_player, depth)
 
@@ -168,10 +103,6 @@ def MAX_VALUE(board, original_player, current_player, depth, max_depth):
 
 
 def MIN_VALUE(board, original_player, current_player, depth, max_depth):
-    """
-    MIN algorithm implementation  
-    Returns the utility value for minimizing player
-    """
     if TERMINAL_TEST(board) or depth >= max_depth:
         return EVALUATE(board, original_player, depth)
 
@@ -187,32 +118,25 @@ def MIN_VALUE(board, original_player, current_player, depth, max_depth):
 
 
 def MINIMAX(board, playerTurn, max_depth=3):
-    """
-    Main Minimax function that returns the best action
-    playerTurn is the maximizing player (our player)
-    """
     best_action = None
     best_value = float('-inf')
 
     actions = ACTIONS(board, playerTurn)
 
     if not actions:
-        return None  # No valid moves
+        return None
 
     for action in actions:
         new_board, next_player = RESULT(board, action, playerTurn)
 
-        # Get the minimax value for this action
         if next_player == playerTurn:
-            # We get another turn (landed in our store)
             action_value = MAX_VALUE(
                 new_board, playerTurn, next_player, 1, max_depth)
         else:
-            # Opponent's turn
+
             action_value = MIN_VALUE(
                 new_board, playerTurn, next_player, 1, max_depth)
 
-        # Keep track of best action
         if action_value > best_value:
             best_value = action_value
             best_action = action
@@ -221,38 +145,9 @@ def MINIMAX(board, playerTurn, max_depth=3):
 
 
 def decide_move(boardIn, playerTurnIn):
-    """
-    Main decision function - uses Minimax algorithm to choose best move
-    """
-    # Use Minimax to find the best move
     best_move = MINIMAX(boardIn, playerTurnIn, max_depth=3)
-
-    if best_move is None:
-        # Fallback to random if no move found (shouldn't happen)
-        moves = ['1', '2', '3', '4', '5', '6']
-        if playerTurnIn == 1:
-            options = np.array(boardIn[0:6])
-            options = np.where(options > 0)
-            options = options[0]
-            if len(options) > 0:
-                position = options[np.random.randint(len(options), size=1)]
-                playerMove = moves[position[0]]
-            else:
-                playerMove = '1'  # Default fallback
-        elif playerTurnIn == 2:
-            options = np.array(boardIn[7:13])
-            options = np.where(options > 0)
-            options = options[0]
-            if len(options) > 0:
-                position = options[np.random.randint(len(options), size=1)]
-                playerMove = moves[position[0]]
-            else:
-                playerMove = '1'  # Default fallback
-        return playerMove, "fallback_random"
-
-    # Convert best_move to string format expected by server
     playerMove = str(best_move)
-    return playerMove, "minimax_ai"
+    return playerMove, "minimax"
 
 
 def play(playerTurn: int, playerMove: int, boardGame):
